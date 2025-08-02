@@ -1,27 +1,72 @@
-const menu = [
-    { name: "Home", href: "#home" },
-    { name: "Skills", href: "#skills" },
-    { name: "Projects", href: "#projects" },
-    { name: "Experience", href: "#experience" },
-    { name: "Education", href: "#education" },
-    { name: "Certificates", href: "#certificates" },
-    { name: "Services", href: "#services" },
-    { name: "Contact", href: "#contact" },
-]
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import Educations from "./sections/educations";
+import Skills from "./sections/skills";
+import WorkExperienceTimeline from "./sections/experiences";
+import Contacts from "./sections/contacts";
+import DockerMobile from "./docker.mobile";
+import SidebarAside from "./sidebar.aside";
+import Projects from "./sections/projects";
+import { Briefcase, BarChart2, GraduationCap, Phone, ToolCase } from "lucide-react";
+
+
+export const menu = [
+  { name: "Skills", id: "skills", icon: <ToolCase size={24} /> },
+  { name: "Projects", id: "projects", icon: <Briefcase size={24} /> },
+  { name: "Experience", id: "experience", icon: <BarChart2 size={24} /> },
+  { name: "Education", id: "education", icon: <GraduationCap size={24} /> },
+  { name: "Contact", id: "contact", icon: <Phone size={24} /> },
+];
+
+export interface SideProps {
+    activeSection: string;
+    setActiveSection: (id: string) => void;
+}
+
+
+// Section content mapping
+const sectionMap: Record<string, React.ReactNode> = {
+  skills: <Skills />,
+  projects: <Projects/>,
+  experience: <WorkExperienceTimeline />,
+  education: <Educations />,
+  contact: <Contacts />,
+};
+
 export default function SidebarMenu() {
-    return (
-        <div className="container mx-auto mt-8 w-full p-4 border-l-2 border-gray-200 dark:border-gray-700">
-        <nav className="flex flex-col gap-4">
-            {menu.map((item) => (
-                <a
-                    key={item.name}
-                    href={item.href}
-                    className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200"
-                >
-                    {item.name}
-                </a>
-            ))}
-        </nav>
-        </div>
-    );
+  const [activeSection, setActiveSection] = useState("skills");
+
+  return (
+    <div className="container mx-auto px-4 pb-24 flex flex-col md:flex-row gap-6">
+      {/* Sidebar for desktop */}
+      <SidebarAside
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
+
+      {/* Main content area */}
+      <main className="flex-1 bg-white dark:bg-gray-900 rounded-xl shadow p-4 min-h-[300px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSection}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+          >
+            {sectionMap[activeSection] || <div>Not Found</div>}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {/* Dock mobile menu (bottom) */}
+      <DockerMobile
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+      />
+    </div>
+  );
 }
